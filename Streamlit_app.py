@@ -14,6 +14,9 @@ from sentence_transformers import SentenceTransformer, util
 from data_cleaning import prepare_document, cos_dicts
 from sklearn.feature_extraction.text import TfidfVectorizer
 import torch
+import nltk
+
+nltk.download('punkt')
 
 # Images used in Page
 image = Image.open('Images/LOGO.png')
