@@ -1,8 +1,0 @@
-streamlit
-PIL
-numpy
-pandas
-sentence_transformers
-torch
-st-card-component==0.0.10
-scikit-learn
