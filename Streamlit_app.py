@@ -7,7 +7,7 @@ from PIL import Image
 
 # Streamlit Modules
 import streamlit as st
-#from st_card_component import card_component
+from st_card_component import card_component
 
 # NLP Modules
 from sentence_transformers import SentenceTransformer, util
@@ -72,12 +72,6 @@ st.subheader('Results')
 amount_of_cols = len(files) / 3
 ceiled_amount = int(np.ceil(amount_of_cols))
 
-# Here basically, we limit the output based on users input State
-if option_state == 'All':
-    files = files
-else:
-    files = files[files.State == option_state]
-
 # Here, if the option for paid is both paid and unpaid, we want to return the entire dataframe, else we return
 # only a subset or. We used the try - except block to avoid error in a case where a user removes all filters
 if len(options) == 2:
@@ -87,6 +81,12 @@ else:
         files = files[files.Status == options[0]]
     except:
         pass
+
+# Here basically, we limit the output based on users input State
+if option_state == 'All':
+    files = files
+else:
+    files = files[files.State == option_state]
 
 # The show_table part returns a dataframe if the user prefers that view.
 if show_table:
