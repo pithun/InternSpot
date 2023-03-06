@@ -1,8 +1,6 @@
 PIL
-matplotlib
 numpy
 pandas
-seaborn
 sentence_transformers
 torch
 st_card_component
