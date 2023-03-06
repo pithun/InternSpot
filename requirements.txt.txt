@@ -4,5 +4,5 @@ numpy
 pandas
 sentence_transformers
 torch
-st_card_component
+st-card-component 0.0.10
 scikit-learn
