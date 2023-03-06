@@ -1,6 +1,8 @@
+streamlit
 PIL
 numpy
 pandas
 sentence_transformers
 torch
 st_card_component
+scikit-learn
