@@ -1,0 +1,8 @@
+streamlit==1.13.0
+Pillow==9.2.0
+numpy==1.23.3
+pandas==1.5.0
+sentence_transformers==2.2.2
+torch==1.13.1
+st-card-component==0.0.10
+scikit-learn==1.2.1
