@@ -7,7 +7,7 @@ from PIL import Image
 
 # Streamlit Modules
 import streamlit as st
-from st_card_component import card_component
+#from st_card_component import card_component
 
 # NLP Modules
 from sentence_transformers import SentenceTransformer, util
