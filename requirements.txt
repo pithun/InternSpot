@@ -6,3 +6,4 @@ sentence_transformers==2.2.2
 torch==1.13.1
 st-card-component==0.0.10
 scikit-learn==1.2.1
+textacy==0.12.0
