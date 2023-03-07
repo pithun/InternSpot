@@ -131,6 +131,7 @@ if st.button('Search') and len(to_be_searched) > 0:
     nat_lan_df = all_data.copy()
     nat_lan_df = nat_lan_df[nat_lan_df['Company'].isin(nli_search(to_be_searched))]
     nat_lan_df.reset_index(drop=True, inplace=True)
+    st.write('NOTE: The results displays the top 5 most similar companies to your search')
     st.dataframe(nat_lan_df[['Company', 'Sector', 'Status', 'LinkedIn']])
 else:
     # The show_table part returns a dataframe if the user prefers that view.
@@ -143,7 +144,7 @@ else:
         # This part loops through the ceiled amount which was the rounding up result of dividing total companies
         # by 3. Basically, this helps us know how many rows of columns we're creating.
         try:
-            st.write('Total of ' + str(len(files)) + ' Companies see them below')
+            st.write('Based on your filter, there\'s a total of ' + str(len(files)) + ' Companies see them below')
 
             subset_start = 0
             subset_end = 3
