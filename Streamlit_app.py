@@ -31,7 +31,7 @@ st.write('This is a repository containing RECENT Industrial training companies s
          ' past set, the aim is to provide feasible companies to Students.')
 st.write(' This app uses State of the art Machine Learning technique under the domain of Natural Language'
          ' Processing to help students search descriptively for the kind of Company they want. '
-         'Who says you don\'t have a choice ?? Hop over to the side bar ⬅ and make an Advanced Search 🔍')
+         'Who says you don\'t have a choice ?? USE THE FILTERS IN THE SIDEBAR ⬅ or go below and make an Advanced Search 🔍')
 
 # Reading the data
 files = pd.read_csv('IT_companies_data/Company_data.csv')
@@ -62,11 +62,10 @@ options = st.sidebar.multiselect(
     ['Paid', 'Not Paid'], 'Paid')
 show_table = st.sidebar.checkbox('Show table instead')
 
-# Creating input box for advances searches
-to_be_searched = st.sidebar.text_input('Advanced Search', placeholder='Describe your target company Instead')
-
 
 st.subheader('Results')
+# Creating input box for advances searches
+to_be_searched = st.text_input('Advanced Search', placeholder='Describe your target company Instead')
 
 # We used card below with three cards in a row, this calculations were wrt that
 amount_of_cols = len(files) / 3
@@ -88,65 +87,6 @@ if option_state == 'All':
 else:
     files = files[files.State == option_state]
 
-# The show_table part returns a dataframe if the user prefers that view.
-if show_table:
-    df = files.copy()[['Company', 'Sector', 'Status', 'LinkedIn']]
-    df.reset_index(drop=True, inplace=True)
-    st.write('Total of ' + str(len(files)) + ' Companies see them below')
-    st.dataframe(df)
-else:
-    # This part loops through the ceiled amount which was the rounding up result of dividing total companies
-    # by 3. Basically, this helps us know how many rows of columns we're creating.
-    try:
-        st.write('Total of ' + str(len(files)) + ' Companies see them below')
-
-        subset_start = 0
-        subset_end = 3
-        key1 = 1
-        key2 = 2
-        key3 = 3
-        for a in range(ceiled_amount):
-            # st.write(a)
-            subset = files.iloc[subset_start:subset_end, :]
-            # st.write(subset.Company.values[0])
-            colu1, colu2, colu3 = st.columns(3)
-            with colu1:
-                card1 = card_component(title=subset.Company.values[0],
-                                       context=subset.Sector.values[0],
-                                       highlight_start=0,
-                                       highlight_end=len(subset.Sector.values[0]),
-                                       score=subset.Status.values[0] + ' IT - ' + subset.State.values[0],
-                                       url=subset.LinkedIn.values[0],
-                                       key=key1
-                                       )
-            with colu2:
-                card2 = card_component(title=subset.Company.values[1],
-                                       context=subset.Sector.values[1],
-                                       highlight_start=0,
-                                       highlight_end=len(subset.Sector.values[1]),
-                                       score=subset.Status.values[1] + ' IT - ' + subset.State.values[1],
-                                       url=subset.LinkedIn.values[1],
-                                       key=key2
-                                       )
-            with colu3:
-                card3 = card_component(title=subset.Company.values[2],
-                                       context=subset.Sector.values[2],
-                                       highlight_start=0,
-                                       highlight_end=len(subset.Sector.values[2]),
-                                       score=subset.Status.values[2] + ' IT - ' + subset.State.values[2],
-                                       url=subset.LinkedIn.values[2],
-                                       key=key3
-                                       )
-            key1 += 0.33
-            key2 += 0.33
-            key3 += 0.33
-
-            subset_start += 3
-            subset_end += 3
-
-    except:
-        pass
-
 # Applying Machine Learning
 cleaned_about = files.About.apply(lambda x: prepare_document(x))
 files['cleaned_about'] = cleaned_about
@@ -156,9 +96,19 @@ tfidf_about = tfidf.fit_transform(cleaned_about.tolist())
 about_cos_dict = cos_dicts(files.Company, tfidf_about.toarray())
 
 embedder = SentenceTransformer('msmarco-MiniLM-L6-cos-v5')
-msmarco_embeddings = embedder.encode(files.About.tolist(), convert_to_tensor=True)
 
 
+@st.cache
+def embed(data):
+    embedding = embedder.encode(data.About.tolist(), convert_to_tensor=True)
+    return embedding
+
+
+all_data = pd.read_csv('IT_companies_data/Company_data.csv')
+
+about_embedding = embed(all_data)
+
+@st.cache
 def nli_search(query):
     # given a query, return top few similar games
 
@@ -166,22 +116,86 @@ def nli_search(query):
     query_embedding = embedder.encode(query, convert_to_tensor=True)
 
     # We use cosine-similarity and torch.topk to find the highest 5 scores
-    cos_scores = util.cos_sim(query_embedding, msmarco_embeddings)[0]
+    cos_scores = util.cos_sim(query_embedding, about_embedding)[0]
     top_results = torch.topk(cos_scores, k=5)
 
     ret_list = []
 
     for score, idx in zip(top_results[0], top_results[1]):
-        ret_list.append((files.Company.tolist()[idx]))
+        ret_list.append((all_data.Company.tolist()[idx]))
 
     return ret_list
 
 
-st.subheader('Advanced Search Result')
-st.write('Hint: Select All States for our advanced search to go through the entire Dataset.')
-if st.sidebar.button('Search'):
-    nat_lan_df = files.copy()
+if st.button('Search') and len(to_be_searched) > 0:
+    nat_lan_df = all_data.copy()
     nat_lan_df = nat_lan_df[nat_lan_df['Company'].isin(nli_search(to_be_searched))]
-    nat_lan_df.reset_index(drop= True, inplace= True)
+    nat_lan_df.reset_index(drop=True, inplace=True)
     st.dataframe(nat_lan_df[['Company', 'Sector', 'Status', 'LinkedIn']])
+else:
+    # The show_table part returns a dataframe if the user prefers that view.
+    if show_table:
+        df = files.copy()[['Company', 'Sector', 'Status', 'LinkedIn']]
+        df.reset_index(drop=True, inplace=True)
+        st.write('Total of ' + str(len(files)) + ' Companies see them below')
+        st.dataframe(df)
+    else:
+        # This part loops through the ceiled amount which was the rounding up result of dividing total companies
+        # by 3. Basically, this helps us know how many rows of columns we're creating.
+        try:
+            st.write('Total of ' + str(len(files)) + ' Companies see them below')
 
+            subset_start = 0
+            subset_end = 3
+            key1 = 1
+            key2 = 2
+            key3 = 3
+            for a in range(ceiled_amount):
+                # st.write(a)
+                subset = files.iloc[subset_start:subset_end, :]
+                # st.write(subset.Company.values[0])
+                colu1, colu2, colu3 = st.columns(3)
+                with colu1:
+                    card1 = card_component(title=subset.Company.values[0],
+                                           context=subset.Sector.values[0],
+                                           highlight_start=0,
+                                           highlight_end=len(subset.Sector.values[0]),
+                                           score=subset.Status.values[0] + ' IT - ' + subset.State.values[0],
+                                           url=subset.LinkedIn.values[0],
+                                           key=key1
+                                           )
+                with colu2:
+                    card2 = card_component(title=subset.Company.values[1],
+                                           context=subset.Sector.values[1],
+                                           highlight_start=0,
+                                           highlight_end=len(subset.Sector.values[1]),
+                                           score=subset.Status.values[1] + ' IT - ' + subset.State.values[1],
+                                           url=subset.LinkedIn.values[1],
+                                           key=key2
+                                           )
+                with colu3:
+                    card3 = card_component(title=subset.Company.values[2],
+                                           context=subset.Sector.values[2],
+                                           highlight_start=0,
+                                           highlight_end=len(subset.Sector.values[2]),
+                                           score=subset.Status.values[2] + ' IT - ' + subset.State.values[2],
+                                           url=subset.LinkedIn.values[2],
+                                           key=key3
+                                           )
+                key1 += 0.33
+                key2 += 0.33
+                key3 += 0.33
+
+                subset_start += 3
+                subset_end += 3
+
+        except:
+            pass
+
+# st.subheader('Advanced Search Result')
+# st.write('Hint: Select All States for our advanced search to go through the entire Dataset.')
+# if st.sidebar.button('Search'):
+#   nat_lan_df = files.copy()
+#  nat_lan_df = nat_lan_df[nat_lan_df['Company'].isin(nli_search(to_be_searched))]
+# nat_lan_df.reset_index(drop=True, inplace=True)
+# st.dataframe(nat_lan_df[['Company', 'Sector', 'Status', 'LinkedIn']])
