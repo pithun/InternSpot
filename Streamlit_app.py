@@ -104,7 +104,7 @@ about_cos_dict = cos_dicts(files.Company, tfidf_about.toarray())
 embedder = SentenceTransformer('msmarco-MiniLM-L6-cos-v5')
 
 
-@st.cache_resource
+@st.cache_resource()
 def embed(data):
     embedding = embedder.encode(data.About.tolist(), convert_to_tensor=True)
     return embedding
@@ -115,7 +115,7 @@ all_data = pd.read_csv('IT_companies_data/Company_data.csv')
 about_embedding = embed(all_data)
 
 
-@st.cache_resource
+@st.cache_resource()
 def nli_search(query):
     # given a query, return top few similar games
 
