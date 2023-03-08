@@ -16,7 +16,14 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import torch
 import nltk
 
-nltk.download('punkt')
+doc = 'punkt'
+
+
+@st.cache
+def load_nltk(doc):
+    return nltk.download(doc)
+
+load_nltk(doc)
 
 # Images used in Page
 image = Image.open('Images/LOGO.png')
@@ -62,7 +69,6 @@ options = st.sidebar.multiselect(
     ['Paid', 'Not Paid'], 'Paid')
 show_table = st.sidebar.checkbox('Show table instead')
 
-
 st.subheader('Results')
 # Creating input box for advances searches
 to_be_searched = st.text_input('Advanced Search', placeholder='Describe your target company Instead')
@@ -98,7 +104,7 @@ about_cos_dict = cos_dicts(files.Company, tfidf_about.toarray())
 embedder = SentenceTransformer('msmarco-MiniLM-L6-cos-v5')
 
 
-@st.cache
+@st.cache_resource
 def embed(data):
     embedding = embedder.encode(data.About.tolist(), convert_to_tensor=True)
     return embedding
@@ -108,7 +114,8 @@ all_data = pd.read_csv('IT_companies_data/Company_data.csv')
 
 about_embedding = embed(all_data)
 
-@st.cache
+
+@st.cache_resource
 def nli_search(query):
     # given a query, return top few similar games
 
