@@ -100,13 +100,12 @@ files['cleaned_about'] = cleaned_about
 tfidf = TfidfVectorizer()
 tfidf_about = tfidf.fit_transform(cleaned_about.tolist())
 about_cos_dict = cos_dicts(files.Company, tfidf_about.toarray())
-
-embedder = SentenceTransformer('msmarco-MiniLM-L6-cos-v5')
 all_data = pd.read_csv('IT_companies_data/Company_data.csv')
 
 
 @st.cache
 def embed(data):
+    embedder = SentenceTransformer('msmarco-MiniLM-L6-cos-v5')
     embedding = embedder.encode(data.About.tolist(), convert_to_tensor=True)
     return embedding
 
