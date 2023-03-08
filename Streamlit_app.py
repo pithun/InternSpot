@@ -107,10 +107,11 @@ all_data = pd.read_csv('IT_companies_data/Company_data.csv')
 def embed(data):
     embedder = SentenceTransformer('msmarco-MiniLM-L6-cos-v5')
     embedding = embedder.encode(data.About.tolist(), convert_to_tensor=True)
-    return embedding
+    return embedder, embedding
 
 
-about_embedding = embed(all_data)
+about_embedding = embed(all_data)[1]
+embedder = embed(all_data)[0]
 
 
 @st.cache
