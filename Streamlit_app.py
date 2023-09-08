@@ -36,9 +36,9 @@ st.title('InternSpot (Beta Version)')
 
 st.write('This is a repository containing RECENT Industrial training companies sourced directly from the'
          ' past set, the aim is to provide feasible companies to Students.')
-st.write(' This app uses State of the art Machine Learning technique under the domain of Natural Language'
-         ' Processing to help students search descriptively for the kind of Company they want. '
-         'Who says you don\'t have a choice ?? USE THE FILTERS IN THE SIDEBAR ⬅ or go below and make an Advanced Search 🔍')
+st.write(' This app uses State of the art Machine Learning to help students search descriptively for the kind of Company they want. '
+         'Who says you don\'t have a choice ??')
+st.write('USE THE FILTERS or make an Advanced Search 🔍')
 
 # Reading the data
 files = pd.read_csv('IT_companies_data/Company_data.csv')
@@ -46,10 +46,10 @@ files = pd.read_csv('IT_companies_data/Company_data.csv')
 import streamlit as st
 
 st.subheader('Incentive😁!!!')
-st.write('For the Final years in Civil Engineering we provide'
-         + '\n' + '1. A [Google drive](https://drive.google.com/drive/folders/1DieblSG7sz9OA3b_kJaQ3Y6CPGZOLmJe?usp=drive_link)'
+st.write('For the Final years in Civil Engineering we provide;'
+         + '\n' + '1. A [Google Drive](https://drive.google.com/drive/folders/1DieblSG7sz9OA3b_kJaQ3Y6CPGZOLmJe?usp=drive_link)'
                   ' with Rich content on all courses you\'ll be studying this year (2021/2022 set notes, past questions, '
-                  'useful youtube links, past questions, and more to come!'
+                  'useful youtube links, and more to come!'
          + '\n' + '2. A way to help those coming after you we believe Internsp🔍t will play a huge role going forward and'
                   'it\'s only going to be possible through you'
          )
@@ -69,18 +69,27 @@ with col2:
     st.write('We see the Paid-Non Paid fraction across States. All IT companies in Lagos were paid although '
              'sources didn\'t drop the amount 😅.')
 
-# Creating the option for all States in the dataset
-states = ['All', 'Abia', 'Abuja', 'Anambra', 'Delta', 'Enugu', 'Lagos', 'Rivers', 'Ebonyi', 'Cross River',
-          'Ogun']
-option_state = st.sidebar.selectbox('What\'s your prefered state ?', options=states)
 
-# Creating a multiselect to enable paid/not paid IT filtering
-options = st.sidebar.multiselect(
-    'Paid, Not Paid',
-    ['Paid', 'Not Paid'], 'Paid')
-show_table = st.sidebar.checkbox('Show table instead')
+st.subheader('SP🔍T A COMPANY')
 
-st.subheader('Results')
+#st.write('Use Filters or Make an Advanced search')
+
+# Using Streamlit's column function to Place two other Summary pictures in columns
+cola_1, cola_2 = st.columns(2)
+
+with cola_1:
+    # Creating the option for all States in the dataset
+    states = ['All', 'Abia', 'Abuja', 'Anambra', 'Delta', 'Enugu', 'Lagos', 'Rivers', 'Ebonyi', 'Cross River',
+              'Ogun']
+    option_state = st.selectbox('What\'s your prefered state ?', options=states)
+
+with cola_2:
+    # Creating a multiselect to enable paid/not paid IT filtering
+    options = st.multiselect(
+        'Paid, Not Paid',
+        ['Paid', 'Not Paid'], 'Paid')
+show_table = st.checkbox('Show table instead')
+
 # Creating input box for advances searches
 to_be_searched = st.text_input('Advanced Search', placeholder='Describe your target company Instead')
 
@@ -109,6 +118,7 @@ cleaned_about = files.About.apply(lambda x: prepare_document(x))
 files['cleaned_about'] = cleaned_about
 
 tfidf = TfidfVectorizer()
+tfidf_about = tfidf.fit_transform(cleaned_about.tolist())
 tfidf_about = tfidf.fit_transform(cleaned_about.tolist())
 about_cos_dict = cos_dicts(files.Company, tfidf_about.toarray())
 all_data = pd.read_csv('IT_companies_data/Company_data.csv')
@@ -152,6 +162,7 @@ if st.button('Search') and len(to_be_searched) > 0:
     st.dataframe(nat_lan_df[['Company', 'Sector', 'Status', 'LinkedIn']])
 else:
     # The show_table part returns a dataframe if the user prefers that view.
+    st.markdown("""**Note:** :red[Advanced Search overwrites the result of the filters]""")
     if show_table:
         df = files.copy()[['Company', 'Sector', 'Status', 'LinkedIn']]
         df.reset_index(drop=True, inplace=True)
