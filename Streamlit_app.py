@@ -162,7 +162,7 @@ if st.button('Search') and len(to_be_searched) > 0:
     st.dataframe(nat_lan_df[['Company', 'Sector', 'Status', 'LinkedIn']])
 else:
     # The show_table part returns a dataframe if the user prefers that view.
-    st.markdown("""**Note:** :red[Advanced Search overwrites the result of the filters]""")
+    st.markdown(""":red[Advanced Search overwrites the result of the filters]""")
     if show_table:
         df = files.copy()[['Company', 'Sector', 'Status', 'LinkedIn']]
         df.reset_index(drop=True, inplace=True)
