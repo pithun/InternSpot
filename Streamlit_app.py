@@ -51,7 +51,7 @@ st.write('For the Final years in Civil Engineering we provide;'
                   ' with Rich content on all courses you\'ll be studying this year (2021/2022 set notes, past questions, '
                   'useful youtube links, and more to come!'
          + '\n' + '2. A way to help those coming after you we believe Internsp🔍t will play a huge role going forward and'
-                  'it\'s only going to be possible through you'
+                  ' it\'s only going to be possible through you'
          )
 
 st.subheader('DataSet Overview')
