@@ -18,8 +18,8 @@ import nltk
 
 doc = 'punkt'
 
-
-@st.cache
+#@st.cache previously incase site misbehaves
+@st.cache_resource
 def load_nltk(doc):
     return nltk.download(doc)
 
@@ -42,6 +42,17 @@ st.write(' This app uses State of the art Machine Learning technique under the d
 
 # Reading the data
 files = pd.read_csv('IT_companies_data/Company_data.csv')
+
+import streamlit as st
+
+st.subheader('Incentive😁!!!')
+st.write('For the Final years in Civil Engineering we provide'
+         + '\n' + '1. A [Google drive](https://drive.google.com/drive/folders/1DieblSG7sz9OA3b_kJaQ3Y6CPGZOLmJe?usp=drive_link)'
+                  ' with Rich content on all courses you\'ll be studying this year (2021/2022 set notes, past questions, '
+                  'useful youtube links, past questions, and more to come!'
+         + '\n' + '2. A way to help those coming after you we believe Internsp🔍t will play a huge role going forward and'
+                  'it\'s only going to be possible through you'
+         )
 
 st.subheader('DataSet Overview')
 
@@ -103,7 +114,7 @@ about_cos_dict = cos_dicts(files.Company, tfidf_about.toarray())
 all_data = pd.read_csv('IT_companies_data/Company_data.csv')
 
 
-@st.cache
+@st.cache_resource
 def embed(data):
     embedder = SentenceTransformer('msmarco-MiniLM-L6-cos-v5')
     embedding = embedder.encode(data.About.tolist(), convert_to_tensor=True)
@@ -114,7 +125,7 @@ about_embedding = embed(all_data)[1]
 embedder = embed(all_data)[0]
 
 
-@st.cache
+@st.cache_resource
 def nli_search(query):
     # given a query, return top few similar games
 
