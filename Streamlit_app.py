@@ -19,7 +19,7 @@ import nltk
 doc = 'punkt'
 
 #@st.cache previously incase site misbehaves
-@st.cache
+@st.cache_resource
 def load_nltk(doc):
     return nltk.download(doc)
 
@@ -50,8 +50,8 @@ st.write('For the Final years in Civil Engineering we provide;'
          + '\n' + '1. A [Google Drive](https://drive.google.com/drive/folders/1DieblSG7sz9OA3b_kJaQ3Y6CPGZOLmJe?usp=drive_link)'
                   ' with Rich content on all courses you\'ll be studying this year (2021/2022 set notes, past questions, '
                   'useful youtube links, and more to come!'
-         + '\n' + '2. A way to help those coming after you we believe Internsp🔍t will play a huge role going forward and'
-                  ' it\'s only going to be possible through you'
+         + '\n' + '2. A way to help those coming after you. We believe Internsp🔍t will play a huge role going forward and'
+                  ' it\'s only going to be possible through you.'
          )
 
 st.subheader('DataSet Overview')
@@ -90,8 +90,10 @@ with cola_2:
         ['Paid', 'Not Paid'], 'Paid')
 show_table = st.checkbox('Show table instead')
 
+
 # Creating input box for advances searches
-to_be_searched = st.text_input('Advanced Search', placeholder='Describe your target company Instead')
+with st.expander(':blue[Use Advanced Search]'):
+    to_be_searched = st.text_input('Enter Description', placeholder='e.g. A paid construction company in Lagos')
 
 # We used card below with three cards in a row, this calculations were wrt that
 amount_of_cols = len(files) / 3
@@ -124,7 +126,7 @@ about_cos_dict = cos_dicts(files.Company, tfidf_about.toarray())
 all_data = pd.read_csv('IT_companies_data/Company_data.csv')
 
 
-@st.cache
+@st.cache_resource
 def embed(data):
     embedder = SentenceTransformer('msmarco-MiniLM-L6-cos-v5')
     embedding = embedder.encode(data.About.tolist(), convert_to_tensor=True)
@@ -135,7 +137,7 @@ about_embedding = embed(all_data)[1]
 embedder = embed(all_data)[0]
 
 
-@st.cache
+@st.cache_resource
 def nli_search(query):
     # given a query, return top few similar games
 
@@ -144,7 +146,7 @@ def nli_search(query):
 
     # We use cosine-similarity and torch.topk to find the highest 5 scores
     cos_scores = util.cos_sim(query_embedding, about_embedding)[0]
-    top_results = torch.topk(cos_scores, k=5)
+    top_results = torch.topk(cos_scores, k=7)
 
     ret_list = []
 
@@ -153,16 +155,17 @@ def nli_search(query):
 
     return ret_list
 
-
-if st.button('Search') and len(to_be_searched) > 0:
+st.write("**NOTE:** :red[Hit Search after using Filters or Advanced Search but Advanced Search overwrites the result of the Filters]")
+search = st.button('Search') 
+if search and len(to_be_searched) > 0:
     nat_lan_df = all_data.copy()
     nat_lan_df = nat_lan_df[nat_lan_df['Company'].isin(nli_search(to_be_searched))]
     nat_lan_df.reset_index(drop=True, inplace=True)
-    st.write('NOTE: The results displays the top 5 most similar companies to your search')
+    st.write('**NOTE:** :red[The results displays the top 7 most similar companies to your search]')
     st.dataframe(nat_lan_df[['Company', 'Sector', 'Status', 'LinkedIn']])
-else:
+elif search:
     # The show_table part returns a dataframe if the user prefers that view.
-    st.markdown("""**NOTE:** Advanced Search overwrites the result of the filters""")
+    # st.markdown("""**NOTE:** Advanced Search overwrites the result of the filters""")
     if show_table:
         df = files.copy()[['Company', 'Sector', 'Status', 'LinkedIn']]
         df.reset_index(drop=True, inplace=True)
