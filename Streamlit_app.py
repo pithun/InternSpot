@@ -162,8 +162,7 @@ def nli_search(query):
 
     return ret_list
 
-st.write("**NOTE:** :red[Hit Search after using Filters or Advanced Search but Advanced Search overwrites the result of the Filters]",
-         unsafe_allow_html = True)
+st.write("**NOTE:** Hit Search after using Filters or Advanced Search but Advanced Search overwrites the result of the Filters")
 search = st.button('Search') 
 if search and len(to_be_searched) > 0:
     nat_lan_df = all_data.copy()
@@ -174,14 +173,13 @@ if search and len(to_be_searched) > 0:
 elif search:
     # The show_table part returns a dataframe if the user prefers that view.
     # st.markdown("""**NOTE:** Advanced Search overwrites the result of the filters""")
-    if show_table:
+    if show_table and len(files) > 0:
         df = files.copy()[['Company', 'Sector', 'Status', 'LinkedIn']]
         df.reset_index(drop=True, inplace=True)
         st.write('Total of ' + str(len(files)) + ' Companies see them below')
         st.dataframe(df)
     elif len(files) == 0:
-        st.write('😥**There\'s currently no company in our Database that meets your search.**', unsafe_allow_html= True)
-
+        st.write('😥**There\'s currently no company in our Database that meets your search.**')
     else:
         # This part loops through the ceiled amount which was the rounding up result of dividing total companies
         # by 3. Basically, this helps us know how many rows of columns we're creating.
