@@ -92,7 +92,7 @@ show_table = st.checkbox('Show table instead')
 
 
 # Creating input box for advances searches
-with st.expander(':blue[Use Advanced Search]'):
+with st.expander('Use Advanced Search'):
     to_be_searched = st.text_input('Enter Description', placeholder='e.g. A paid construction company in Lagos')
 
 # We used card below with three cards in a row, this calculations were wrt that
@@ -155,13 +155,13 @@ def nli_search(query):
 
     return ret_list
 
-st.write("**NOTE:** :red[Hit Search after using Filters or Advanced Search but Advanced Search overwrites the result of the Filters]")
+st.write("**NOTE:** Hit Search after using Filters or Advanced Search but Advanced Search overwrites the result of the Filters")
 search = st.button('Search') 
 if search and len(to_be_searched) > 0:
     nat_lan_df = all_data.copy()
     nat_lan_df = nat_lan_df[nat_lan_df['Company'].isin(nli_search(to_be_searched))]
     nat_lan_df.reset_index(drop=True, inplace=True)
-    st.write('**NOTE:** :red[The results displays the top 7 most similar companies to your search]')
+    st.write('**NOTE:** The results displays the top 7 most similar companies to your search')
     st.dataframe(nat_lan_df[['Company', 'Sector', 'Status', 'LinkedIn']])
 elif search:
     # The show_table part returns a dataframe if the user prefers that view.
