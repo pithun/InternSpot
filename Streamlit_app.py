@@ -16,6 +16,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import torch
 import nltk
 
+# Enabling wide mode for app
+st. set_page_config(layout="wide") 
+ 
 doc = 'punkt'
 
 #@st.cache previously incase site misbehaves
@@ -120,12 +123,14 @@ cleaned_about = files.About.apply(lambda x: prepare_document(x))
 files['cleaned_about'] = cleaned_about
 
 tfidf = TfidfVectorizer()
-tfidf_about = tfidf.fit_transform(cleaned_about.tolist())
-tfidf_about = tfidf.fit_transform(cleaned_about.tolist())
-about_cos_dict = cos_dicts(files.Company, tfidf_about.toarray())
-all_data = pd.read_csv('IT_companies_data/Company_data.csv')
-
-
+try:
+    tfidf_about = tfidf.fit_transform(cleaned_about.tolist())
+    tfidf_about = tfidf.fit_transform(cleaned_about.tolist())
+    about_cos_dict = cos_dicts(files.Company, tfidf_about.toarray())
+    all_data = pd.read_csv('IT_companies_data/Company_data.csv')
+except:
+    pass
+    
 @st.cache
 def embed(data):
     embedder = SentenceTransformer('msmarco-MiniLM-L6-cos-v5')
@@ -133,9 +138,11 @@ def embed(data):
     return embedder, embedding
 
 
-about_embedding = embed(all_data)[1]
-embedder = embed(all_data)[0]
-
+try:
+    about_embedding = embed(all_data)[1]
+    embedder = embed(all_data)[0]
+except:
+    pass
 
 @st.cache
 def nli_search(query):
@@ -155,7 +162,8 @@ def nli_search(query):
 
     return ret_list
 
-st.write("**NOTE:** Hit Search after using Filters or Advanced Search but Advanced Search overwrites the result of the Filters")
+st.write("**NOTE:** :red[Hit Search after using Filters or Advanced Search but Advanced Search overwrites the result of the Filters]",
+         unsafe_allow_html = True)
 search = st.button('Search') 
 if search and len(to_be_searched) > 0:
     nat_lan_df = all_data.copy()
@@ -171,6 +179,9 @@ elif search:
         df.reset_index(drop=True, inplace=True)
         st.write('Total of ' + str(len(files)) + ' Companies see them below')
         st.dataframe(df)
+    elif len(files) == 0:
+        st.write('😥**There\'s currently no company in our Database that meets your search.**', unsafe_allow_html= True)
+
     else:
         # This part loops through the ceiled amount which was the rounding up result of dividing total companies
         # by 3. Basically, this helps us know how many rows of columns we're creating.
